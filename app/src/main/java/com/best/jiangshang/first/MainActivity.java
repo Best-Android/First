@@ -21,6 +21,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         init();
+        rb_weixin.setChecked(true);//刚开始进入第一个界面时设置为选中状态
     }
 
     private void init() {
