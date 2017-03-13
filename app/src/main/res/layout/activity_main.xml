@@ -29,6 +29,7 @@
             android:button="@null"
             android:gravity="center"
             android:text="微信"
+            android:textColor="@color/green_text_selector"
             />
 
         <RadioButton
@@ -40,6 +41,7 @@
                 android:button="@null"
                 android:gravity="center"
                 android:text="通信录"
+                android:textColor="@color/cut_text_selector"
                 />
 
         <RadioButton
@@ -51,6 +53,7 @@
             android:button="@null"
             android:gravity="center"
             android:text="发现"
+            android:textColor="@color/cut_text_selector"
             />
 
         <RadioButton
@@ -62,6 +65,7 @@
                 android:button="@null"
                 android:gravity="center"
                 android:text="我"
+                android:textColor="@color/cut_text_selector"
                 />
         </RadioGroup>
 </RelativeLayout>
