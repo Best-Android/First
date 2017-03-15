@@ -7,6 +7,9 @@ package com.best.jiangshang.first.been;
 public class Images {
     private String images;
 
+    public Images() {
+    }
+
     public Images(String images) {
         this.images = images;
     }

@@ -123,16 +123,16 @@ public class Results {
     @Override
     public String toString() {
         return "Results{" +
-                "_id='" + _id + '\'' +
-                ", createdAt='" + createdAt + '\'' +
-                ", desc='" + desc + '\'' +
+                "_id='" + _id + '\n' +
+                ", createdAt='" + createdAt + '\n' +
+                ", desc='" + desc + '\n' +
                 ", images=" + images +
-                ", publishedAt='" + publishedAt + '\'' +
-                ", source='" + source + '\'' +
-                ", type='" + type + '\'' +
-                ", url='" + url + '\'' +
+                ", publishedAt='" + publishedAt + '\n' +
+                ", source='" + source + '\n' +
+                ", type='" + type + '\n' +
+                ", url='" + url + '\n' +
                 ", used=" + used +
-                ", who='" + who + '\'' +
+                ", who='" + who + '\n' +
                 '}';
     }
 }
