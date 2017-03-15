@@ -32,6 +32,8 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<Fragment> pages=new ArrayList<Fragment>();
     ViewPager vPager;
     MyAdapter myadapter;
+
+    String url="http://gank.io/api/data/Android/10/1";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
                 .readTimeout(10000L,TimeUnit.MILLISECONDS)
                 .build();
         OkHttpUtils.initClient(okHttpClient);
-        String url="http://gank.io/api/data/Android/10/1";
+        //String url="http://gank.io/api/data/Android/10/1";
         OkHttpUtils.get().url(url).build().execute(new StringCallback() {
             @Override
             public void onError(Call call, Exception e, int id) {
