@@ -25,8 +25,9 @@ public class Json {
             boolean error=jsonObject.getBoolean("error");
             JSONArray jsonArray=jsonObject.getJSONArray("results");
             List<Results> list=new ArrayList<Results>();
-            List<String> imagesList=new ArrayList<String>();
+           // List<String> imagesList=new ArrayList<String>();
             for(int i=0;i<jsonArray.length();i++){
+                List<String> imagesList=new ArrayList<String>();
                 JSONObject jsonResults=(JSONObject)jsonArray.get(i);
                 String _id=jsonResults.getString("_id");
                 String createdAt=jsonResults.getString("createdAt");
