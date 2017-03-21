@@ -23,10 +23,22 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     final static int TYPE_FOOTER = 1;
     Context context;
     ArrayList<Results> picturesList;
+    boolean isMore;
+    String footerText;
     public RecyclerViewAdapter(Context context,ArrayList<Results> picturesList){
         this.context=context;
         this.picturesList=picturesList;
 
+    }
+    public boolean isMore(){
+        return isMore;
+    }
+    public void setMore(boolean more){
+        isMore=more;
+    }
+    public void setFooter(String footerText){
+        this.footerText=footerText;
+        notifyDataSetChanged();
     }
 
     @Override
@@ -41,7 +53,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         View layout=null;
         switch (i){
             case TYPE_FOOTER:
-                layout=inflater.inflate(R.layout.item,viewGroup,false);
+                layout=inflater.inflate(R.layout.footitem,viewGroup,false);
                 holder=new FooterViewHolder(layout);
                 break;
             case TYPE_ITEM:
@@ -50,6 +62,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 break;
         }
         return holder;
+
     }
 
     @Override
@@ -81,6 +94,10 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             picturesList.clear();
         }
         picturesList.addAll(list);
+        notifyDataSetChanged();
+    }
+    public void addData(List<Results> list){
+        this.picturesList.addAll(list);
         notifyDataSetChanged();
     }
 }
