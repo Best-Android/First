@@ -52,11 +52,11 @@ public class Json {
                 Results results=new Results(_id,createdAt,desc,imagesList,publishedAt,source,type,url,used,who);
                 list.add(results);
             }
-            Log.d(TAG,list.toString());
+            //Log.d(TAG,list.toString());
             picturesData = new PicturesData();
             picturesData.setError(error);
             picturesData.setResults(list);
-            Log.d(TAG, "onResponse: " + picturesData.toString());
+           // Log.d(TAG, "onResponse: " + picturesData.toString());
         } catch (JSONException e) {
             e.printStackTrace();
         }

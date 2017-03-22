@@ -7,9 +7,11 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.best.jiangshang.first.been.Json;
 import com.best.jiangshang.first.been.PicturesData;
@@ -38,14 +40,20 @@ public class WXFragment extends Fragment {
     RecyclerView rvPicture;
     @BindView(R.id.swipe_refresh_widget)
     SwipeRefreshLayout swipeRefreshLayout;
+    @BindView(R.id.tvRefreshHint)
+    TextView tvRefreshHint;
 
     ArrayList<Results> mPicturesList;
     RecyclerViewAdapter recyclerViewAdapter;
     LinearLayoutManager linearLayoutManager;
     Unbinder unbinder;
-    int mPageId;
+    int mPageId=1;
     int mNewState;
-    String url="http://gank.io/api/data/Android/10/1";
+    private static final String TAG="Jiangshang";
+    private final static String Myurl="http://gank.io/api/data/Android/10/";
+
+
+
     public WXFragment() {
         // Required empty public constructor
     }
@@ -69,6 +77,7 @@ public class WXFragment extends Fragment {
     }
     private void setPullDownListener(){
         rvPicture.setOnScrollListener(new RecyclerView.OnScrollListener(){
+            int lastPosition;
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
@@ -80,6 +89,15 @@ public class WXFragment extends Fragment {
                     mPageId++;
                     downloadData(ACTION_PULL_UP,mPageId);
                 }
+                if(newState!=RecyclerView.SCROLL_STATE_DRAGGING){
+                    recyclerViewAdapter.notifyDataSetChanged();
+                }
+            }
+
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                lastPosition=linearLayoutManager.findLastVisibleItemPosition();
             }
         });
     }
@@ -88,9 +106,27 @@ public class WXFragment extends Fragment {
 
             @Override
             public void onRefresh() {
-                mPageId=1;
-                swipeRefreshLayout.setEnabled(true);
+                //mPageId=1;
+                Log.d("jiangshang","invoke onRefresh...");
+/*                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                       List<String> newDatas=new ArrayList<String>();
+                        for(int i=0;i<5;i++){
+                            int index=i+1;
+                            newDatas.add("new item"+index);
+                        }
+
+
+                    }
+                },5000);*/
+//                swipeRefreshLayout.setEnabled(true);
+//                swipeRefreshLayout.setRefreshing(true);
+//                downloadData(ACTION_PULL_DOWN,mPageId);
                 swipeRefreshLayout.setRefreshing(true);
+                swipeRefreshLayout.setEnabled(true);
+                tvRefreshHint.setVisibility(View.VISIBLE);
+                mPageId=1;
                 downloadData(ACTION_PULL_DOWN,mPageId);
             }
         });
@@ -103,36 +139,45 @@ public class WXFragment extends Fragment {
     }
 
         private void downloadData(final int actionDown,int pageId){
-        OkHttpUtils.get().url(url).build().execute(new StringCallback() {
-            @Override
-            public void onError(Call call, Exception e, int id) {
+            Log.d(TAG,"downloadData:"+actionDown+", "+pageId);
+            String url=Myurl + pageId;
+            Log.d(TAG, "downloadData: "+url);
+            OkHttpUtils.get().url(url).build().execute(new StringCallback() {
+                @Override
+                public void onError(Call call, Exception e, int id) {
+                    swipeRefreshLayout.setRefreshing(false);
+                    Log.d(TAG, "onError: "+e.getMessage());
+                }
 
-            }
-
-            @Override
-            public void onResponse(String response, int id) {
-                PicturesData data = Json.Json(response);
-                List<Results> list=data.getResults();
-                recyclerViewAdapter.initData(list);
-                if(!recyclerViewAdapter.isMore()){
-                    if(actionDown==ACTION_PULL_UP){
-                        recyclerViewAdapter.setFooter("nothing");
+                @Override
+                public void onResponse(String response, int id) {
+                    PicturesData data = Json.Json(response);
+                    List<Results> list=data.getResults();
+                    //recyclerViewAdapter.initData(list);
+                    recyclerViewAdapter.setMore(list!=null && list.size()>0);
+                    if(!recyclerViewAdapter.isMore()){
+                        if(actionDown==ACTION_PULL_UP){
+                            recyclerViewAdapter.setFooter("nothing");
+                        }
+                        return;
                     }
-                    return;
+                    recyclerViewAdapter.setFooter("加载更多数据");
+                    switch (actionDown){
+                        case ACTION_DOWNLOAD:
+                            recyclerViewAdapter.initData(list);
+                            recyclerViewAdapter.setFooter("加载更多数据");
+                            break;
+                        case ACTION_PULL_DOWN:
+                            recyclerViewAdapter.initData(list);
+                            recyclerViewAdapter.setFooter("加载更多数据");
+                            swipeRefreshLayout.setRefreshing(false);
+                            tvRefreshHint.setVisibility(View.GONE);
+                            break;
+                        case ACTION_PULL_UP:
+                            recyclerViewAdapter.addData(list);
+                            break;
+                    }
                 }
-                recyclerViewAdapter.setFooter("加载更多数据");
-                switch (actionDown){
-                    case ACTION_DOWNLOAD:
-                        recyclerViewAdapter.initData(list);
-                        break;
-                    case ACTION_PULL_DOWN:
-                        swipeRefreshLayout.setRefreshing(false);
-                        break;
-                    case ACTION_PULL_UP:
-                        recyclerViewAdapter.addData(list);
-                        break;
-                }
-            }
         });
     }
 
