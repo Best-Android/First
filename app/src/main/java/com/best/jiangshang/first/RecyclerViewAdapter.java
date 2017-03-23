@@ -1,11 +1,13 @@
 package com.best.jiangshang.first;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.best.jiangshang.first.been.Results;
@@ -13,6 +15,8 @@ import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.best.jiangshang.first.R.layout.item;
 
 /**
  * Created by Administrator on 2017/3/17.
@@ -57,7 +61,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 holder=new FooterViewHolder(layout);
                 break;
             case TYPE_ITEM:
-                layout=inflater.inflate(R.layout.item,viewGroup,false);
+                layout=inflater.inflate(item,viewGroup,false);
                 holder=new myViewHolder(layout);
                 break;
         }
@@ -79,6 +83,17 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             Glide.with(context).load(picturesData.getImages().get(0))
                     .placeholder(R.mipmap.ic_launcher).into(((myViewHolder) holder).imageView);
         }
+        myviewHolder.item_rl.setTag(picturesData);
+        myviewHolder.item_rl.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Results results = (Results) v.getTag();
+                String url = results.getUrl();
+                Intent intent = new Intent(context.getApplicationContext(), TXLFragment.class);
+                context.startActivity(intent);
+            }
+        });
+
     }
 
     @Override
@@ -104,11 +119,13 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
 
     class myViewHolder extends RecyclerView.ViewHolder{
+        RelativeLayout item_rl;
         ImageView imageView;
         TextView tv_desc;
         TextView tv_who,tv_createdat;
         public myViewHolder(View itemView){
             super(itemView);
+            item_rl = (RelativeLayout) itemView.findViewById(R.id.item_rl);
             imageView=(ImageView)itemView.findViewById(R.id.iv_images);
             tv_desc=(TextView)itemView.findViewById(R.id.tv_desc);
             tv_who=(TextView)itemView.findViewById(R.id.tv_who);
