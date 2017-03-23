@@ -1,6 +1,8 @@
 package com.best.jiangshang.first;
 
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -11,11 +13,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.best.jiangshang.first.been.Json;
 import com.best.jiangshang.first.been.PicturesData;
 import com.best.jiangshang.first.been.Results;
+import com.bumptech.glide.Glide;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
 
@@ -26,6 +31,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import okhttp3.Call;
+
+import static com.best.jiangshang.first.R.layout.item;
 
 
 /**
@@ -52,6 +59,7 @@ public class WXFragment extends Fragment {
     private static final String TAG="Jiangshang";
     private final static String Myurl="http://gank.io/api/data/Android/10/";
 
+    private RelativeLayout item_rl;
 
 
     public WXFragment() {
@@ -75,6 +83,7 @@ public class WXFragment extends Fragment {
         setPullDownListener();
         setPullUpListener();
     }
+
     private void setPullDownListener(){
         rvPicture.setOnScrollListener(new RecyclerView.OnScrollListener(){
             int lastPosition;
@@ -187,6 +196,16 @@ public class WXFragment extends Fragment {
                 rvPicture.setAdapter(recyclerViewAdapter);
                 linearLayoutManager=new LinearLayoutManager(view.getContext());
                 rvPicture.setLayoutManager(linearLayoutManager);
+               // RelativeLayout item_rl = (RelativeLayout) view.findViewById(R.id.item_rl);
+//                item_rl.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View v) {
+//                        Results results = (Results) v.getTag();
+//                        String url = results.getUrl();
+//                        Intent intent = new Intent(getContext(), TXLFragment.class);
+//                        startActivity(intent.putExtra("url",url));
+//                    }
+//                });
             }
 
             @Override
@@ -194,4 +213,130 @@ public class WXFragment extends Fragment {
                 super.onDestroyView();
                 unbinder.unbind();
             }
+
+
+    /*----------------------------------*/
+
+    class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+        final static int TYPE_ITEM = 0;
+        final static int TYPE_FOOTER = 1;
+        Context context;
+        ArrayList<Results> picturesList;
+        boolean isMore;
+        String footerText;
+        public RecyclerViewAdapter(Context context,ArrayList<Results> picturesList){
+            this.context=context;
+            this.picturesList=picturesList;
+
+        }
+        public boolean isMore(){
+            return isMore;
+        }
+        public void setMore(boolean more){
+            isMore=more;
+        }
+        public void setFooter(String footerText){
+            this.footerText=footerText;
+            notifyDataSetChanged();
+        }
+
+        @Override
+        public int getItemCount() {
+            return picturesList==null ? 0 :picturesList.size()+1;
+        }
+
+        @Override
+        public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+            RecyclerView.ViewHolder holder=null;
+            LayoutInflater inflater=LayoutInflater.from(context);
+            View layout=null;
+            switch (i){
+                case TYPE_FOOTER:
+                    layout=inflater.inflate(R.layout.footitem,viewGroup,false);
+                    holder=new com.best.jiangshang.first.FooterViewHolder(layout);
+                    break;
+                case TYPE_ITEM:
+                    layout=inflater.inflate(item,viewGroup,false);
+                    holder=new com.best.jiangshang.first.myViewHolder(layout);
+                    break;
+            }
+            return holder;
+
+        }
+
+        @Override
+        public void onBindViewHolder(RecyclerView.ViewHolder holder, int i) {
+            if(i==getItemCount() -1){
+                return;
+            }
+            com.best.jiangshang.first.myViewHolder myviewHolder=(com.best.jiangshang.first.myViewHolder) holder;
+            Results picturesData=picturesList.get(i);
+            myviewHolder.tv_desc.setText(picturesData.getDesc());
+            myviewHolder.tv_who.setText(picturesData.getWho());
+            myviewHolder.tv_createdat.setText(picturesData.getCreatedAt());
+            if(picturesData.getImages().size()>0){
+                Glide.with(context).load(picturesData.getImages().get(0))
+                        .placeholder(R.mipmap.ic_launcher).into(((com.best.jiangshang.first.myViewHolder) holder).imageView);
+            }
+            myviewHolder.item_rl.setTag(picturesData);
+            myviewHolder.item_rl.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Results results = (Results) v.getTag();
+                    String url = results.getUrl();
+                    Intent intent = new Intent(getContext(), WebViewActivity.class);
+                    startActivity(intent.putExtra("url",url));
+                }
+            });
+
+        }
+
+        @Override
+        public int getItemViewType(int position) {
+            if(position==getItemCount() -1){
+                return TYPE_FOOTER;
+            }else{
+                return TYPE_ITEM;
+            }
+        }
+        public void initData(List<Results> list) {
+            if (picturesList != null) {
+                picturesList.clear();
+            }
+            picturesList.addAll(list);
+            notifyDataSetChanged();
+        }
+        public void addData(List<Results> list){
+            this.picturesList.addAll(list);
+            notifyDataSetChanged();
+        }
+    }
+
+
 }
+class FooterViewHolder extends RecyclerView.ViewHolder{
+    TextView tvFooter;
+    public FooterViewHolder(View itemView){
+        super(itemView);
+        tvFooter=(TextView)itemView.findViewById(R.id.tv_footitem);
+    }
+}
+
+class myViewHolder extends RecyclerView.ViewHolder{
+    RelativeLayout item_rl;
+    ImageView imageView;
+    TextView tv_desc;
+    TextView tv_who,tv_createdat;
+    public myViewHolder(View itemView){
+        super(itemView);
+        item_rl = (RelativeLayout) itemView.findViewById(R.id.item_rl);
+        imageView=(ImageView)itemView.findViewById(R.id.iv_images);
+        tv_desc=(TextView)itemView.findViewById(R.id.tv_desc);
+        tv_who=(TextView)itemView.findViewById(R.id.tv_who);
+        tv_createdat=(TextView)itemView.findViewById(R.id.tv_createdat);
+    }
+}
+
+
+
+
